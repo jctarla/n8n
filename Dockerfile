@@ -150,8 +150,13 @@ WORKDIR /home/node
 # Copy built application from builder stage
 COPY --from=builder --chown=node:node /compiled /usr/local/lib/node_modules/n8n
 
-# Copy task runner launcher if available
-COPY --from=launcher-downloader /launcher-bin/* /usr/local/bin/ 2>/dev/null || true
+# Copy task runner launcher if available (handle case where directory might be empty)
+RUN mkdir -p /tmp/launcher-temp
+COPY --from=launcher-downloader /launcher-bin /tmp/launcher-temp/
+RUN if [ -n "$(ls -A /tmp/launcher-temp/ 2>/dev/null)" ]; then \
+      cp /tmp/launcher-temp/* /usr/local/bin/ 2>/dev/null || true; \
+    fi && \
+    rm -rf /tmp/launcher-temp
 
 # Copy the actual entrypoint script from the source
 COPY docker/images/n8n/docker-entrypoint.sh /docker-entrypoint.sh

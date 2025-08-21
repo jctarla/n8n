@@ -54,13 +54,13 @@ FROM base-deps AS builder
 
 WORKDIR /app
 
-# Copy package manager files
+# Copy package manager files and essential config
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY turbo.json ./
+COPY turbo.json tsconfig.json jest.config.js biome.jsonc vitest.workspace.ts ./
 
-# Copy all package.json files to install dependencies correctly
+# Copy all package.json files and essential config files to install dependencies correctly
 COPY packages/ packages/
-RUN find packages -name "*.ts" -o -name "*.js" -o -name "*.vue" | head -1 > /dev/null || find packages -type f ! -name "package.json" -delete
+RUN find packages -name "*.ts" -o -name "*.js" -o -name "*.vue" -o -name "*.json" -o -name "*.md" | head -1 > /dev/null || find packages -type f ! -name "package.json" ! -name "tsconfig*.json" ! -name "*.config.js" ! -name "*.config.mjs" ! -name "*.config.ts" ! -name "jest.config.*" ! -name "vitest.config.*" ! -name "biome.jsonc" -delete
 
 # Copy patches and scripts (needed for preinstall hooks)
 COPY patches/ patches/

@@ -61,8 +61,9 @@ COPY turbo.json ./
 COPY packages/ packages/
 RUN find packages -name "*.ts" -o -name "*.js" -o -name "*.vue" | head -1 > /dev/null || find packages -type f ! -name "package.json" -delete
 
-# Copy patches
+# Copy patches and scripts (needed for preinstall hooks)
 COPY patches/ patches/
+COPY scripts/ scripts/
 
 # Install all dependencies (including dev dependencies for building)
 RUN pnpm install --frozen-lockfile

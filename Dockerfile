@@ -42,6 +42,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositori
 ENV NODE_ICU_DATA=/usr/local/lib/node_modules/full-icu
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+ENV DOCKER_BUILD=true
 
 # Install pnpm with exact version
 RUN corepack enable && corepack prepare pnpm@10.12.1 --activate

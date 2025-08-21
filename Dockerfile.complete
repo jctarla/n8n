@@ -153,8 +153,11 @@ COPY --from=builder --chown=node:node /compiled /usr/local/lib/node_modules/n8n
 # Copy task runner launcher if available
 COPY --from=launcher-downloader /launcher-bin/* /usr/local/bin/ 2>/dev/null || true
 
+# Copy the actual entrypoint script from the source
+COPY docker/images/n8n/docker-entrypoint.sh /docker-entrypoint.sh
+
 # Copy task runner config if it exists in the source
-COPY --chown=node:node docker/images/n8n/n8n-task-runners.json /etc/n8n-task-runners.json 2>/dev/null || echo '{}' > /etc/n8n-task-runners.json
+COPY docker/images/n8n/n8n-task-runners.json /etc/n8n-task-runners.json
 
 # Setup the application
 RUN cd /usr/local/lib/node_modules/n8n && \
@@ -166,16 +169,8 @@ RUN cd /usr/local/lib/node_modules/n8n && \
     cd /usr/local/lib/node_modules/n8n/node_modules/pdfjs-dist && npm install @napi-rs/canvas && \
     # Setup user directory
     mkdir -p /home/node/.n8n && \
-    chown -R node:node /home/node
-
-# Create a simple entrypoint script
-RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
-    echo 'set -e' >> /docker-entrypoint.sh && \
-    echo 'if [ "$#" -eq 0 ] || [ "$1" = "start" ]; then' >> /docker-entrypoint.sh && \
-    echo '  exec n8n start' >> /docker-entrypoint.sh && \
-    echo 'else' >> /docker-entrypoint.sh && \
-    echo '  exec n8n "$@"' >> /docker-entrypoint.sh && \
-    echo 'fi' >> /docker-entrypoint.sh && \
+    chown -R node:node /home/node && \
+    # Make entrypoint executable
     chmod +x /docker-entrypoint.sh
 
 # Expose port

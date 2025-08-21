@@ -134,9 +134,9 @@ ENV NODE_ENV=production
 ENV N8N_RELEASE_TYPE=stable
 ENV SHELL=/bin/sh
 
-# Create user
-RUN addgroup -g 1000 node && \
-    adduser -u 1000 -G node -s /bin/sh -D node
+# Ensure node user exists with correct permissions
+RUN if ! getent group node > /dev/null 2>&1; then addgroup -g 1000 node; fi && \
+    if ! getent passwd node > /dev/null 2>&1; then adduser -u 1000 -G node -s /bin/sh -D node; fi
 
 # ==============================================================================
 # STAGE 5: Final Runtime Image
